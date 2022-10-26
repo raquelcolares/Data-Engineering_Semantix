@@ -3,7 +3,7 @@
 ## Course - Semantix 
 
 <p align="center">
-    <img width="300" src="https://github.com/raquelcolares/Data-Engineering_Semantix/blob/main/semantix-logo.png">
+    <img width="500" src="https://github.com/raquelcolares/Data-Engineering_Semantix/blob/main/semantix-logo.png">
 </p>
 
 -------
