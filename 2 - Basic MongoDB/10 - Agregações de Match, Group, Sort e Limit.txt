@@ -1,0 +1,113 @@
+			Exercício 10 - Agregações de Match, Group, Sort e Limit
+
+ 
+1 - Crie o banco de dados escola
+Create database -> escola
+
+2 - Crie a collection alunos no banco de dados escola
+escola -> alunos
+
+3 - Importe o arquivo “dataset/alunos.csv” para a collection alunos, com os seguintes atributos:
+id_discente: Number
+nome: String
+ano_ingresso: Number
+nivel: String
+id_curso: Number
+Arquivos para Dataset
+
+alunos -> Add Data -> import file -> csv (anexar arquivo alunos.csv) 
+
+4 - Visualizar os valores únicos do “nivel” de cada “ano_ingresso”
+Aggregations -> select: $group
+{
+  _id: "$ano_ingresso",
+  nivel_por_ano: {
+    $addToSet: "$nivel"
+  }
+}
+
+5 - Calcular a quantidade de alunos matriculados por cada “id_curso”
+Aggregations -> select: $group
+{
+  _id: "$id_curso",
+  qtd_curso: {
+    $sum: 1
+  }
+} 
+
+6 - Calcular a quantidade de alunos matriculados por “ano_ingresso” no "id_curso“: 1222
+Aggregations -> select: $match
+{
+  "id_curso": 1222
+}
+ADD STAGE
+Aggregations -> select: $group
+{
+  _id: "$ano_ingresso",
+  qtd_curso: {
+    $sum: 1
+  }
+}
+
+7 - Visualizar todos os documentos do “nível”: “M”
+Aggregations -> select: $match
+{
+  "nivel": "M"
+}
+
+8 - Visualizar o último ano que teve cada curso (id_curso) dos níveis “M”
+Aggregations -> select: $match
+{
+  "nivel": "M"
+}
+ADD STAGE
+Aggregations -> select: $group
+{
+  _id: "$id_curso",
+  "ultimo_ano": {
+    $max: "$ano_ingresso"
+  }
+}
+
+9 - Visualizar o último ano que teve cada curso (id_curso) dos níveis “M”, ordenados pelos anos mais novos de cada curso
+Aggregations -> select: $match
+{
+  "nivel": "M"
+}
+ADD STAGE
+Aggregations -> select: $group
+{
+  _id: "$id_curso",
+  "ultimo_ano": {
+    $max: "$ano_ingresso"
+  }
+}
+ADD STAGE
+Aggregations -> select: $sort
+{
+  "ultimo_ano_curso": 1
+}
+
+10 - Visualizar o último ano que teve os 5 últimos cursos (id_curso) dos níveis “M”, ordenados pelos anos mais novos
+Aggregations -> select: $match
+{
+  "nivel": "M"
+}
+ADD STAGE
+Aggregations -> select: $group
+{
+  _id: "$id_curso",
+  "ultimo_ano": {
+    $max: "$ano_ingresso"
+  }
+}
+ADD STAGE
+Aggregations -> select: $sort
+{
+  "ultimo_ano_curso": 1
+}
+ADD STAGE
+Aggregations -> select: $limit
+5
+
+

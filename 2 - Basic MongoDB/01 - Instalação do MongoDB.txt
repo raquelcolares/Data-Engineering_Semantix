@@ -1,0 +1,35 @@
+			Exercício 1 - Instalação
+
+
+1 - Criação da pasta mongodb
+$ mkdir mongodb
+
+2 - Baixando o mongo e o mongo-express
+$ docker pull mongo
+$ docker pull mongo-express
+
+3 - Visualizando as imagens
+$ docker images 
+
+4 - Abrindo a pasta para copiar o arquivo "docker-compose.yml"
+$ explorer.exe .
+
+5 - Verificando o arquivo dentro da pasta
+$ ls
+
+6 - Iniciando o docker 
+$ docker-compose up -d
+
+7 - Listando as imagens em execução
+$ docker ps
+
+8 - Acessando o MongoDB 
+$ docker exec -it mongo bash
+$ mongosh
+
+9 - Listando os bancos de dados do MongoDB 
+test> show dbs
+
+10 - Visualizando através do Mongo Express os bancos de dados
+Acesso: http://localhost:8081/
+
