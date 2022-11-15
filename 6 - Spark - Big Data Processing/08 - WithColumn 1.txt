@@ -1,0 +1,21 @@
+			Exercício 8 - WithColumn 1/2
+
+
+1 - Criar um dataframe para ler o arquivo no HDFS /user/<nome/data/juros_selic/juros_selic
+juros = spark.read.csv("/user/raquel/data/juros_selic/juros_selic", sep=";", header="true")
+
+2 - Alterar o formato do campo data para “MM/dd/yyyy”
+juros_americano_unix = juros.withColumn("data", unix_timestamp(col("data"), "dd/MM/yyyy"))
+juros_americano = juros_americano_unix.withColumn("data", from_unixtime("data","MM/dd/yyyy")).show()
+
+3 - Com uso da função from_unixtime crie o campo “ano_unix”, com a informação do ano do campo data
+juros_unixtime = juros_americano.withColumn("ano_unix", from_unixtime(unix_timestamp(col("data"), "dd/MM/yyyy"), "yyyy"))
+
+4 - Com uso de substring crie o campo “ano_str”, com a informação do ano do campo data
+juros_substring = juros_unixtime.withColumn("ano_str", substring(col("data"),7,4))
+
+5 - Com uso da função split crie o campo “ano_str”, com a informação do ano do campo data
+juros_split = juros_substring.withColumn("ano_split", split(col("data", "/").getItem(2))
+
+6 - Salvar no hdfs /user/rodrigo/juros_selic_americano no formato CSV, incluindo o cabeçalho
+juros_split.write.csv("/user/raquel/juros_selic", header="true") 
