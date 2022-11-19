@@ -1,0 +1,35 @@
+			Exercício 11 - DStream - Word Count
+
+
+1 - Criar o diretório no hdfs “/user/<nome>/stream”
+!hdfs dfs -mkdir /user/raquel/stream
+
+2 - Criar uma aplicação para contar palavras a cada 10 segundos da porta 9998 e exibir no console durante 50 segundos
+conf = SparkConf().setMaster("local[+]").setAppName("Dstream WordCount")
+sc = SparkContext.getOrCreate(conf)
+ssc = StreamingContext(sc,10)
+dstream =ssc.socketTextStream("localhost", 9998)
+wordcount = dstream.flatMap(lambda linha: linha.split(" "))\
+		   .map(lambda palavra: (palavra,1))\
+		   .reduceByKey(lambda chave1, chave2: chave1+chave2)
+wordcount.pprint()
+ssc.start()
+sleep(50)
+ssc.stop()
+
+!hdfs dfs -ls /user/raquel/stream/word_count-1625061130000
+
+3 - Criar uma aplicação para contar palavras a cada 10 segundos da porta 9998 e salvar os dados no namenode no diretório “hdfs://namenode/user/rodrigo/stream/word_count” durante 50 segundos
+conf = SparkConf().setMaster("local[+]").setAppName("Dstream WordCount")
+sc = SparkContext.getOrCreate(conf)
+ssc = StreamingContext(sc,10)
+dstream =ssc.socketTextStream("localhost", 9998)
+wordcount = dstream.flatMap(lambda linha: linha.split(" "))\
+		   .map(lambda palavra: (palavra,1))\
+		   .reduceByKey(lambda chave1, chave2: chave1+chave2)
+wordcount.saveAsTextFiles("/user/raquel/stream/word_count")
+ssc.start()
+sleep(50)
+ssc.stop()
+
+!hdfs dfs -ls /user/raquel/stream/word_count-1625061130000
