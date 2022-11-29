@@ -1,0 +1,43 @@
+			Exercício 14 - Structured Streaming
+
+
+1 - Criar uma aplicação em scala usando o spark para ler os dados da porta 9999 e exibir no console
+$ docker exec -it jupyter-spark bash
+# pyspark
+> porta_leitura = spark.readStream.format("socket").option("host").option("port","9999").load()
+> porta_saida = porta_leitura.writeStream.format("console").start()
+
+2 - Ler os arquivos csv “hdfs://namenode:8020/user/<nome>/data/iris/*.data” em modo streaming com o seguinte schema:
+sepal_length float
+sepal_width float
+petal_length float
+petal_width float
+class string
+
+No Jupter:
+iris = spark.read.csv("/user/raquel/data/iris/*.data").show(5)
+from pyspark.sql.types import StructType
+iris_schema = StructType()\
+    .add("sepal_lenght", "float")\
+    .add("sepal_width", "float")\
+    .add("petal_lenght", "float")\
+    .add("petal_width", "float")\
+    .add("class", "string")
+iris = spark.read.schema(iris_schema).csv("/user/raquel/data/iris/*.data").show(10)
+
+3 - Visualizar o schema das informações
+iris.printSchema()
+
+4 - Salvar os dados no diretório “hdfs://namenode:8020/user/<nome>/stream_iris/path” e o checkpoint em “hdfs://namenode:8020/user/<nome>/stream_iris/check”
+iris_saida = iris.writeStream.format("csv")\
+    .option("checkpointLocation", "/user/raquel/stream_iris/check")\
+    .option("path","/user/raquel/stream_iris/path")\
+    .start()
+
+5 - Verificar a saida no hdfs e entender como os dados foram salvos
+iris_saida.status
+!hdfs dfs -ls /user/raquel/stream_iris/check
+!hdfs dfs -ls /user/raquel/stream_iris/path
+
+6 - Bônus: Contar as palavras do exercício 1
+spark.read.csv("/user/raquel/stream_iris/path/part.00000.df30da19.977a.49d0.9abf.40add662c593.c000.csv").count()
