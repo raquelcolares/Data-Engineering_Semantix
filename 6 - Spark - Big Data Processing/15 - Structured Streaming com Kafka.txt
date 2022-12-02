@@ -1,0 +1,50 @@
+			Exercício 15 - Structured Streaming com Kafka
+
+
+1 - Ler o tópico do kafka “topic-kvspark” em modo batch
+from pyspark.sql.functions import *
+topic_read = spark.read\
+     .format("kafka")\
+     .option("kafka.bootstra.servers","kafka:9092")\
+     .option("subscribe","topic-kvspark")\ 
+     .load()
+
+2 - Visualizar o schema do tópico
+topic_read.printSchema()
+
+3 - Visualizar o tópico com o campo key e value convertidos em string
+topic_string = topic_read.select(col("key").cast("string"),col("value").cast("string"))
+topic_string.show()
+
+4 - Ler o tópico do kafka “topic-kvspark” em modo streaming
+topic_read_stream = spark.readStream\
+     .format("kafka")\
+     .option("kafka.bootstra.servers","kafka:9092")\
+     .option("subscribe","topic-kvspark")\ 
+     .load()
+
+5 - Visualizar o schema do tópico em streaming
+topic_read_stream.printSchema()
+
+6 - Alterar o tópico em streaming com o campo key e value convertidos para string
+topic_string_stream = topic_read_stream.select(col("key").cast("string"),col("value").cast("string"))
+
+7 - Salvar o tópico em streaming no tópico topic-kvspark-output a cada 5 segundos
+topic_string_stream_output = topic_string_stream.writeStream\
+     .format("kafka")\
+     .option("kafka.bootstra.servers","kafka:9092")\
+     .option("topic","topic-kvspark-output")\ 
+     .option("checkpointLocation","/user/raquel/kafka_checkpoint")\
+     .trigger(continuous='5 second')\
+     .start()
+
+topic_string_stream_output.status
+
+8 - Salvar o tópico na pasta hdfs://namenode:8020/user/<nome>/Kafka/topic-kvspark-output
+topic_string_stream_output = topic_string_stream.writeStream\
+     .format("csv")\
+     .option("checkpointLocation","/user/raquel/kafka_checkpoint")\
+     .option("path","/user/raquel/kafka/topic-kvsspark-output")\
+     .start()
+
+!hdfs dfs -cat /user/raquel/kafka/topic-kvsspark-output/part-00000-4230a459-96eb-4c11-9b65-a7703e5e85ea-c000.csv
